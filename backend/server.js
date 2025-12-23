@@ -6,21 +6,26 @@ const { default: axios } = require("axios");
 
 const app = express();
 
+// Middleware
 app.use(cors());
 
+// API KEY
 const API_KEY = process.env.COIN_CAP_API_KEY;
 
 let cachedData = [];
 let requestCount = 0;
 
+// 15 Minutes = 900,000 ms. 
 const REFRESH_INTERVAL = 900000;
 const MAX_REQUESTS_PER_SESSION = 100;
 
+//  Keep-Alive Agent
 const httpsAgent = new https.Agent({
   keepAlive: true,
   keepAliveMsecs: 10000,
 });
 
+// Api Client Setup
 const apiClient = axios.create({
   baseURL: 'https://rest.coincap.io/v3',
   httpsAgent: httpsAgent,
@@ -30,10 +35,13 @@ const apiClient = axios.create({
   }
 });
 
+
 const fetchData = async () => {
+ 
+
   if (requestCount >= MAX_REQUESTS_PER_SESSION) {
-    console.log("🛑 Safety Limit Reached! Stopping background updates.");
-    return;
+    console.log("Safety Limit Reached! Stopping background updates.");
+    return; 
   }
 
   try {
@@ -41,24 +49,27 @@ const fetchData = async () => {
     console.log(`🔄 [Req #${requestCount + 1}] Fetching background update...`);
 
     const response = await apiClient.get("/assets?limit=30");
-
+  
     cachedData = response.data.data;
     requestCount++;
 
     const latency = Date.now() - start;
-    console.log(`✅ Success! Cache updated in ${latency}ms.`);
+    console.log(`Success! Cache updated in ${latency}ms.`);
 
     setTimeout(fetchData, REFRESH_INTERVAL);
 
   } catch (error) {
-    console.error("❌ Error fetching data:", error.message);
+    console.error("Error fetching data:", error.message);
     setTimeout(fetchData, REFRESH_INTERVAL);
   }
 }
 
+// Start fetching, when server turns on
 fetchData();
 
+// get api calling
 app.get('/api/live', (req, res) => {
+
   if (requestCount >= MAX_REQUESTS_PER_SESSION) {
     return res.json({
       success: true,
@@ -78,3 +89,5 @@ const port = process.env.PORT || 8000;
 app.listen(port, () =>
   console.log(`🚀 Server listening at http://localhost:${port}`)
 );
+
+
