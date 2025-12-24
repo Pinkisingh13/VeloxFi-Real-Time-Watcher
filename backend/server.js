@@ -35,6 +35,11 @@ const apiClient = axios.create({
   }
 });
 
+//! Before
+// Success! Cache updated in 2260ms.
+
+//! After
+// Success! Cache updated in 1042ms.
 
 const fetchData = async () => {
  
