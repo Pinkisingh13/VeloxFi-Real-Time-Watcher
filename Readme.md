@@ -28,16 +28,6 @@ A full-stack cryptocurrency price tracker with Tinder-style swipe animations. Bu
 
 ---
 
-## 🏗️ Architecture
-
-```
-Flutter App  →  Node.js API  →  CoinCap API
-                    ↓
-               Cache Layer
-```
-
----
-
 ## 🔧 Backend Optimizations
 
 ![Optimization Steps](four_optimization_step.png)
